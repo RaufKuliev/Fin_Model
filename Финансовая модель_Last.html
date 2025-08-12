@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Универсальная финансовая модель</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .input-cell {
+            background-color: #FFFF99 !important;
+            border: 2px solid #FFD700;
+        }
+        .calculated-cell {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        .section-title {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            margin: 20px 0 10px 0;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .table-container {
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        table {
+            min-width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            min-width: 100px;
+        }
+        th {
+            background-color: #4472C4;
+            color: white;
+            font-weight: bold;
+        }
+        .chart-container {
+            height: 400px;
+            margin: 20px 0;
+        }
+        .kpi-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .kpi-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+        .kpi-label {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 5px;
+        }
+        .negative-value {
+            color: #dc2626 !important;
+        }
+        .positive-value {
+            color: #059669 !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto p-4 max-w-7xl">
+        <div class="bg-white shadow-lg rounded-lg p-6">
+            <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">
+                <i class="fas fa-chart-line mr-3"></i>
+                Универсальная финансовая модель
+            </h1>
+
+            <!-- Раздел 1: INPUT (Входные данные) -->
+            <div class="section-title">
+                <i class="fas fa-keyboard mr-2"></i>
+                1. INPUT - Входные данные
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Основные параметры -->
+                    <div>
+                        <h4 class="font-bold mb-3 text-blue-800">Основные параметры</h4>
+                        <div class="space-y-2">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Год начала:</label>
+                                <input type="number" id="startYear" class="input-cell w-full p-2 rounded" value="2024" onchange="updateCalculations()" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Месяц начала:</label>
+                                <select id="startMonth" class="input-cell w-full p-2 rounded" onchange="updateCalculations()">
+                                    <option value="1">Январь</option>
+                                    <option value="2">Февраль</option>
+                                    <option value="3">Март</option>
+                                    <option value="4">Апрель</option>
+                                    <option value="5">Май</option>
+                                    <option value="6">Июнь</option>
+                                    <option value="7">Июль</option>
+                                    <option value="8">Август</option>
+                                    <option value="9">Сентябрь</option>
+                                    <option value="10">Октябрь</option>
+                                    <option value="11">Ноябрь</option>
+                                    <option value="12">Декабрь</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Цена за единицу (руб.):</label>
+                                <input type="number" id="unitPrice" class="input-cell w-full p-2 rounded" value="1000" onchange="updateCalculations()" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Продажи по месяцам -->
+                    <div>
+                        <h4 class="font-bold mb-3 text-blue-800">Объёмы продаж (единиц)</h4>
+                        <div class="space-y-2">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div><label class="text-xs">Месяц 1:</label><input type="number" id="sales_1" class="input-cell w-full p-1 rounded text-sm" value="100" onchange="updateCalculations()" /></div>
+                                <div><label class="text-xs">Месяц 2:</label><input type="number" id="sales_2" class="input-cell w-full p-1 rounded text-sm" value="120" onchange="updateCalculations()" /></div>
+                                <div><label class="text-xs">Месяц 3:</label><input type="number" id="sales_3" class="input-cell w-full p-1 rounded text-sm" value="140" onchange="updateCalculations()" /></div>
+                                <div><label class="text-xs">Месяц 4:</label><input type="number" id="sales_4" class="input-cell w-full p-1 rounded text-sm" value="160" onchange="updateCalculations()" /></div>
+                                <div><label class="text-xs">Месяц 5:</label><input type="number" id="sales_5" class="input-cell w-full p-1 rounded text-sm" value="180" onchange="updateCalculations()" /></div>
+                                <div><label class="text-xs">Месяц 6:</label><input type="number" id="sales_6" class="input-cell w-full p-1 rounded text-sm" value="200" onchange="updateCalculations()" /></div>
+                                <div><label class="text-xs">Месяц 7:</label><input type="number" id="sales_7" class="input-cell w-full p-1 rounded text-sm" value="220" onchange="updateCalculations()" /></div>
+                                <div><label class="text-xs">Месяц 8:</label><input type="number" id="sales_8" class="input-cell w-full p-1 rounded text-sm" value="240" onchange="updateCalculations()" /></div>
+                                <div><label class="text-xs">Месяц 9:</label><input type="number" id="sales_9" class="input-cell w-full p-1 rounded text-sm" value="260" onchange="updateCalculations()" /></div>
+                                <div><label class="text-xs">Месяц 10:</label><input type="number" id="sales_10" class="input-cell w-full p-1 rounded text-sm" value="280" onchange="updateCalculations()" /></div>
+                                <div><label class="text-xs">Месяц 11:</label><input type="number" id="sales_11" class="input-cell w-full p-1 rounded text-sm" value="300" onchange="updateCalculations()" /></div>
+                                <div><label class="text-xs">Месяц 12:</label><input type="number" id="sales_12" class="input-cell w-full p-1 rounded text-sm" value="320" onchange="updateCalculations()" /></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Расходы -->
+                    <div>
+                        <h4 class="font-bold mb-3 text-blue-800">Расходы</h4>
+                        <div class="space-y-2">
+                            <div><label class="block text-sm font-medium mb-1">Переменные расходы на единицу (руб.):</label><input type="number" id="variableCost" class="input-cell w-full p-2 rounded" value="400" onchange="updateCalculations()" /></div>
+                            <div><label class="block text-sm font-medium mb-1">Зарплата (руб./мес.):</label><input type="number" id="salary" class="input-cell w-full p-2 rounded" value="500000" onchange="updateCalculations()" /></div>
+                            <div><label class="block text-sm font-medium mb-1">Аренда (руб./мес.):</label><input type="number" id="rent" class="input-cell w-full p-2 rounded" value="200000" onchange="updateCalculations()" /></div>
+                            <div><label class="block text-sm font-medium mb-1">Маркетинг (руб./мес.):</label><input type="number" id="marketing" class="input-cell w-full p-2 rounded" value="100000" onchange="updateCalculations()" /></div>
+                            <div><label class="block text-sm font-medium mb-1">Административные (руб./мес.):</label><input type="number" id="admin" class="input-cell w-full p-2 rounded" value="150000" onchange="updateCalculations()" /></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Дополнительные параметры -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
+                    <div><label class="block text-sm font-medium mb-1">Капитальные затраты (руб.):</label><input type="number" id="capex" class="input-cell w-full p-2 rounded" value="2000000" onchange="updateCalculations()" /></div>
+                    <div><label class="block text-sm font-medium mb-1">Инвестиции (руб.):</label><input type="number" id="investment" class="input-cell w-full p-2 rounded" value="5000000" onchange="updateCalculations()" /></div>
+                    <div><label class="block text-sm font-medium mb-1">Ставка налога (%):</label><input type="number" id="taxRate" class="input-cell w-full p-2 rounded" value="20" onchange="updateCalculations()" /></div>
+                    <div><label class="block text-sm font-medium mb-1">Ставка дисконтирования (%):</label><input type="number" id="discountRate" class="input-cell w-full p-2 rounded" value="12" onchange="updateCalculations()" /></div>
+                </div>
+
+                <!-- Добавляем блок для займов и дивидендов -->
+                <div class="mt-8">
+                    <h4 class="font-bold mb-3 text-blue-800">Финансовая деятельность (займы и дивиденды)</h4>
+                    <div class="grid grid-cols-2 gap-2" id="loanDividendInputsContainer"></div>
+                    <template id="loanDividendInputsTemplate">
+                        <div>
+                            <label class="text-xs">Займы (руб.):</label>
+                            <input type="number" id="loan_##" class="input-cell w-full p-1 rounded text-sm" value="0" onchange="updateCalculations()" />
+                        </div>
+                        <div>
+                            <label class="text-xs">Дивиденды (руб.):</label>
+                            <input type="number" id="dividend_##" class="input-cell w-full p-1 rounded text-sm" value="0" onchange="updateCalculations()" />
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Раздел 2: P&L -->
+            <div class="section-title mt-8">
+                <i class="fas fa-chart-bar mr-2"></i>
+                2. P&L - Отчёт о прибылях и убытках
+            </div>
+            <div class="table-container">
+                <table class="w-full" id="plTable">
+                    <thead>
+                        <tr>
+                            <th>Показатель</th>
+                            <th>Месяц 1</th>
+                            <th>Месяц 2</th>
+                            <th>Месяц 3</th>
+                            <th>Месяц 4</th>
+                            <th>Месяц 5</th>
+                            <th>Месяц 6</th>
+                            <th>Месяц 7</th>
+                            <th>Месяц 8</th>
+                            <th>Месяц 9</th>
+                            <th>Месяц 10</th>
+                            <th>Месяц 11</th>
+                            <th>Месяц 12</th>
+                            <th>ИТОГО ГОД</th>
+                        </tr>
+                    </thead>
+                    <tbody id="plTableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- Раздел 3: Cash Flow -->
+            <div class="section-title">
+                <i class="fas fa-money-bill-wave mr-2"></i>
+                3. Cash Flow - Движение денежных средств
+            </div>
+            <div class="table-container">
+                <table class="w-full" id="cfTable">
+                    <thead>
+                        <tr>
+                            <th>Показатель</th>
+                            <th>Месяц 1</th>
+                            <th>Месяц 2</th>
+                            <th>Месяц 3</th>
+                            <th>Месяц 4</th>
+                            <th>Месяц 5</th>
+                            <th>Месяц 6</th>
+                            <th>Месяц 7</th>
+                            <th>Месяц 8</th>
+                            <th>Месяц 9</th>
+                            <th>Месяц 10</th>
+                            <th>Месяц 11</th>
+                            <th>Месяц 12</th>
+                            <th>ИТОГО ГОД</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cfTableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- Раздел 4: Balance Sheet -->
+            <div class="section-title">
+                <i class="fas fa-balance-scale mr-2"></i>
+                4. Balance Sheet - Баланс
+            </div>
+            <div class="table-container">
+                <table class="w-full" id="bsTable">
+                    <thead>
+                        <tr>
+                            <th>Показатель</th>
+                            <th>Месяц 1</th>
+                            <th>Месяц 2</th>
+                            <th>Месяц 3</th>
+                            <th>Месяц 4</th>
+                            <th>Месяц 5</th>
+                            <th>Месяц 6</th>
+                            <th>Месяц 7</th>
+                            <th>Месяц 8</th>
+                            <th>Месяц 9</th>
+                            <th>Месяц 10</th>
+                            <th>Месяц 11</th>
+                            <th>Месяц 12</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bsTableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- Раздел 5: KPI -->
+            <div class="section-title">
+                <i class="fas fa-tachometer-alt mr-2"></i>
+                5. KPI - Ключевые показатели эффективности
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4" id="kpiContainer"></div>
+
+            <!-- Раздел 6: Dashboard -->
+            <div class="section-title">
+                <i class="fas fa-chart-pie mr-2"></i>
+                6. Dashboard - Дашборд с визуализацией
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-4 rounded-lg border">
+                    <h4 class="font-bold mb-3 text-center">Динамика выручки и прибыли</h4>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-lg border">
+                    <h4 class="font-bold mb-3 text-center">Структура постоянных расходов</h4>
+                    <div class="chart-container">
+                        <canvas id="expenseChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-lg border">
+                    <h4 class="font-bold mb-3 text-center">Денежные потоки по месяцам</h4>
+                    <div class="chart-container">
+                        <canvas id="cashFlowChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-lg border">
+                    <h4 class="font-bold mb-3 text-center">Накопительный денежный поток</h4>
+                    <div class="chart-container">
+                        <canvas id="cumulativeCashChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let charts = {};
+        let calculatedData = {};
+
+        // Динамически создадим поля для займов и дивидендов по месяцам
+        function createLoanDividendInputs() {
+            const container = document.getElementById('loanDividendInputsContainer');
+            container.innerHTML = '';
+            const template = document.getElementById('loanDividendInputsTemplate').innerHTML;
+            for (let i = 1; i <= 12; i++) {
+                container.insertAdjacentHTML('beforeend', template.replace(/##/g, i));
+            }
+        }
+
+        function formatNumber(num) {
+            if (num === null || num === undefined || isNaN(num)) return '0';
+            return new Intl.NumberFormat('ru-RU').format(Math.round(num));
+        }
+
+        function formatPercent(num) {
+            if (num === null || num === undefined || isNaN(num)) return '0.0%';
+            return (num * 100).toFixed(1) + '%';
+        }
+
+        function getInputValue(id) {
+            const element = document.getElementById(id);
+            return element ? parseFloat(element.value) || 0 : 0;
+        }
+
+        function calculateFinancials() {
+            const unitPrice = getInputValue('unitPrice');
+            const variableCost = getInputValue('variableCost');
+            const salary = getInputValue('salary');
+            const rent = getInputValue('rent');
+            const marketing = getInputValue('marketing');
+            const admin = getInputValue('admin');
+            const capex = getInputValue('capex');
+            const investment = getInputValue('investment');
+            const taxRate = getInputValue('taxRate') / 100;
+            const discountRate = getInputValue('discountRate') / 100;
+
+            // Получаем объёмы продаж по месяцам
+            const salesVolume = [];
+            for (let i = 1; i <= 12; i++) {
+                salesVolume.push(getInputValue(`sales_${i}`));
+            }
+
+            // Чтение займов и дивидендов по месяцам
+            const loans = [];
+            const dividends = [];
+            for (let i = 1; i <= 12; i++) {
+                loans.push(getInputValue(`loan_${i}`));
+                dividends.push(getInputValue(`dividend_${i}`));
+            }
+
+            // Расчёты P&L по месяцам
+            const revenue = salesVolume.map(vol => vol * unitPrice);
+            const cogs = salesVolume.map(vol => vol * variableCost);
+            const grossProfit = revenue.map((rev, i) => rev - cogs[i]);
+            const fixedCosts = salary + rent + marketing + admin;
+            const operatingExpenses = Array(12).fill(fixedCosts);
+            const ebitda = grossProfit.map(gp => gp - fixedCosts);
+            const depreciation = Array(12).fill(capex / 60); // 5 лет амортизации
+            const ebit = ebitda.map((ebitda_val, i) => ebitda_val - depreciation[i]);
+            const taxes = ebit.map(ebit_val => ebit_val > 0 ? ebit_val * taxRate : 0);
+            const netIncome = ebit.map((ebit_val, i) => ebit_val - taxes[i]);
+
+            // Расчёты Cash Flow
+            const operatingCashFlow = netIncome.map((ni, i) => ni + depreciation[i]);
+            const investingCashFlow = [investment - capex].concat(Array(11).fill(0));
+            const financingCashFlow = loans.map((loan, i) => loan - dividends[i]);
+            const netCashFlow = operatingCashFlow.map((ocf, i) => ocf + investingCashFlow[i] + financingCashFlow[i]);
+
+            // Накопительный денежный поток
+            const cumulativeCashFlow = [];
+            let cumulative = 0;
+            for (let i = 0; i < 12; i++) {
+                cumulative += netCashFlow[i];
+                cumulativeCashFlow.push(cumulative);
+            }
+
+            // Расчёт баланса
+            const cash = [];
+            let cashBalance = investment;
+            for (let i = 0; i < 12; i++) {
+                cashBalance += netCashFlow[i];
+                cash.push(Math.max(0, cashBalance));
+            }
+
+            const fixedAssets = [];
+            let assetValue = capex;
+            for (let i = 0; i < 12; i++) {
+                assetValue -= depreciation[i];
+                fixedAssets.push(Math.max(0, assetValue));
+            }
+
+            const totalAssets = cash.map((c, i) => c + fixedAssets[i]);
+
+            // Считаем накопленные займы (обязательства)
+            const cumulativeLoans = [];
+            let totalLoans = 0;
+            for (let i = 0; i < 12; i++) {
+                totalLoans += loans[i]; // Займы увеличивают обязательства
+                totalLoans -= dividends[i]; // Дивиденды уменьшают капитал
+                cumulativeLoans.push(totalLoans);
+            }
+
+            // Нераспределённая прибыль с учётом дивидендов
+            const retainedEarnings = [];
+            let retained = 0;
+            for (let i = 0; i < 12; i++) {
+                retained += netIncome[i] - dividends[i];
+                retainedEarnings.push(retained);
+            }
+
+            // Собственный капитал
+            const equity = retainedEarnings.map(re => investment + re);
+
+            // Итого обязательства и капитал (для проверки баланса)
+            const totalLiabEquity = equity.map((eq, i) => eq + cumulativeLoans[i]);
+
+            // KPI расчёты
+            const totalRevenue = revenue.reduce((a, b) => a + b, 0);
+            const totalNetIncome = netIncome.reduce((a, b) => a + b, 0);
+            const finalEquity = equity[11];
+            const finalAssets = totalAssets[11];
+
+            const ros = totalRevenue > 0 ? totalNetIncome / totalRevenue : 0;
+            const roe = finalEquity > 0 ? totalNetIncome / finalEquity : 0;
+            const roa = finalAssets > 0 ? totalNetIncome / finalAssets : 0;
+
+            // Период окупаемости
+            let paybackPeriod = 'Не окупается';
+            for (let i = 0; i < 12; i++) {
+                if (cumulativeCashFlow[i] > 0) {
+                    paybackPeriod = i + 1;
+                    break;
+                }
+            }
+
+            // NPV
+            let npv = -capex + investment;
+            for (let i = 0; i < 12; i++) {
+                npv += operatingCashFlow[i] / Math.pow(1 + discountRate / 12, i + 1);
+            }
+
+            // Break-even point
+            const contributionMargin = unitPrice - variableCost;
+            const breakEvenPoint = contributionMargin > 0 ? fixedCosts / contributionMargin : 0;
+
+            return {
+                revenue,
+                cogs,
+                grossProfit,
+                operatingExpenses,
+                ebitda,
+                depreciation,
+                ebit,
+                taxes,
+                netIncome,
+                operatingCashFlow,
+                investingCashFlow,
+                financingCashFlow,
+                netCashFlow,
+                cumulativeCashFlow,
+                cash,
+                fixedAssets,
+                totalAssets,
+                retainedEarnings,
+                equity,
+                cumulativeLoans,
+                totalLiabEquity,
+                totalRevenue,
+                totalNetIncome,
+                ros,
+                roe,
+                roa,
+                paybackPeriod,
+                npv,
+                breakEvenPoint,
+                fixedCosts
+            };
+        }
+
+        function updatePLTable() {
+            const data = calculatedData;
+            const tbody = document.getElementById('plTableBody');
+
+            const rows = [
+                ['Выручка', ...data.revenue, data.totalRevenue],
+                ['Себестоимость', ...data.cogs, data.cogs.reduce((a, b) => a + b, 0)],
+                ['Валовая прибыль', ...data.grossProfit, data.grossProfit.reduce((a, b) => a + b, 0)],
+                ['Постоянные расходы', ...data.operatingExpenses, data.operatingExpenses.reduce((a, b) => a + b, 0)],
+                ['EBITDA', ...data.ebitda, data.ebitda.reduce((a, b) => a + b, 0)],
+                ['Амортизация', ...data.depreciation, data.depreciation.reduce((a, b) => a + b, 0)],
+                ['EBIT', ...data.ebit, data.ebit.reduce((a, b) => a + b, 0)],
+                ['Налоги', ...data.taxes, data.taxes.reduce((a, b) => a + b, 0)],
+                ['Чистая прибыль', ...data.netIncome, data.totalNetIncome]
+            ];
+
+            tbody.innerHTML = '';
+            rows.forEach(row => {
+                const tr = document.createElement('tr');
+                row.forEach((cell, cellIndex) => {
+                    const td = document.createElement('td');
+                    if (cellIndex === 0) {
+                        td.textContent = cell;
+                        td.style.fontWeight = 'bold';
+                        td.style.textAlign = 'left';
+                    } else {
+                        const value = parseFloat(cell);
+                        td.textContent = formatNumber(value);
+                        if (value < 0) td.classList.add('negative-value');
+                        else if (value > 0) td.classList.add('positive-value');
+                    }
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateCashFlowTable() {
+            const data = calculatedData;
+            const tbody = document.getElementById('cfTableBody');
+
+            const rows = [
+                ['Операционная деятельность', '', '', '', '', '', '', '', '', '', '', '', ''],
+                ['Чистая прибыль', ...data.netIncome, data.totalNetIncome],
+                ['Амортизация', ...data.depreciation, data.depreciation.reduce((a, b) => a + b, 0)],
+                ['Операционный CF', ...data.operatingCashFlow, data.operatingCashFlow.reduce((a, b) => a + b, 0)],
+                ['Инвестиционная деятельность', '', '', '', '', '', '', '', '', '', '', '', ''],
+                ['CapEx и инвестиции', ...data.investingCashFlow, data.investingCashFlow.reduce((a, b) => a + b, 0)],
+                ['Финансовая деятельность', '', '', '', '', '', '', '', '', '', '', '', ''],
+                ['Займы/дивиденды', ...data.financingCashFlow, data.financingCashFlow.reduce((a, b) => a + b, 0)],
+                ['Чистый денежный поток', ...data.netCashFlow, data.netCashFlow.reduce((a, b) => a + b, 0)],
+                ['Накопительный CF', ...data.cumulativeCashFlow, data.cumulativeCashFlow[11]]
+            ];
+
+            tbody.innerHTML = '';
+            rows.forEach(row => {
+                const tr = document.createElement('tr');
+                if (row[1] === '') {
+                    tr.style.backgroundColor = '#e3f2fd';
+                    tr.style.fontWeight = 'bold';
+                }
+
+                row.forEach((cell, cellIndex) => {
+                    const td = document.createElement('td');
+                    if (cellIndex === 0) {
+                        td.textContent = cell;
+                        td.style.fontWeight = 'bold';
+                        td.style.textAlign = 'left';
+                    } else if (cell === '') {
+                        td.textContent = '';
+                    } else {
+                        const value = parseFloat(cell);
+                        td.textContent = formatNumber(value);
+                        if (value < 0) td.classList.add('negative-value');
+                        else if (value > 0) td.classList.add('positive-value');
+                    }
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateBalanceSheet() {
+            const data = calculatedData;
+            const tbody = document.getElementById('bsTableBody');
+
+            const rows = [
+                ['АКТИВЫ', '', '', '', '', '', '', '', '', '', '', '', ''],
+                ['Денежные средства', ...data.cash],
+                ['Основные средства', ...data.fixedAssets],
+                ['Итого активы', ...data.totalAssets],
+                ['ОБЯЗАТЕЛЬСТВА', '', '', '', '', '', '', '', '', '', '', '', ''],
+                ['Займы (кредиты)', ...data.cumulativeLoans],
+                ['Кредиторская задолженность', ...Array(12).fill(0)],
+                ['КАПИТАЛ', '', '', '', '', '', '', '', '', '', '', '', ''],
+                ['Уставный капитал', ...Array(12).fill(getInputValue('investment'))],
+                ['Нераспределённая прибыль', ...data.retainedEarnings],
+                ['Итого капитал', ...data.equity],
+                ['Итого обязательства и капитал', ...data.totalLiabEquity],
+                ['БАЛАНС (проверка)', ...data.totalLiabEquity.map((val, i) => val - data.totalAssets[i])]
+            ];
+
+            tbody.innerHTML = '';
+            rows.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                if (row[1] === '') {
+                    tr.style.backgroundColor = '#e3f2fd';
+                    tr.style.fontWeight = 'bold';
+                }
+
+                row.forEach((cell, cellIndex) => {
+                    const td = document.createElement('td');
+                    if (cellIndex === 0) {
+                        td.textContent = cell;
+                        td.style.fontWeight = 'bold';
+                        td.style.textAlign = 'left';
+                    } else if (cell === '') {
+                        td.textContent = '';
+                    } else {
+                        const value = parseFloat(cell);
+                        td.textContent = formatNumber(value);
+                        if (value < 0) td.classList.add('negative-value');
+                        else if (value > 0) td.classList.add('positive-value');
+
+                        // Выделить ошибки баланса
+                        if (index === rows.length - 1 && Math.abs(value) > 1) {
+                            td.style.backgroundColor = '#ffebee';
+                            td.style.color = '#c62828';
+                        }
+                    }
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateKPI() {
+            const data = calculatedData;
+            const container = document.getElementById('kpiContainer');
+
+            const kpis = [
+                { label: 'ROS (%)', value: formatPercent(data.ros) },
+                { label: 'ROE (%)', value: formatPercent(data.roe) },
+                { label: 'ROA (%)', value: formatPercent(data.roa) },
+                { label: 'Окупаемость (мес.)', value: data.paybackPeriod },
+                { label: 'NPV (руб.)', value: formatNumber(data.npv) },
+                { label: 'Break-even (ед.)', value: formatNumber(data.breakEvenPoint) }
+            ];
+
+            container.innerHTML = '';
+            kpis.forEach(kpi => {
+                const card = document.createElement('div');
+                card.className = 'kpi-card';
+                card.innerHTML = `
+                    <div class="kpi-value">${kpi.value}</div>
+                    <div class="kpi-label">${kpi.label}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateCharts() {
+            const data = calculatedData;
+            const months = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
+
+            // График выручки и прибыли
+            if (charts.revenue) charts.revenue.destroy();
+            const ctx1 = document.getElementById('revenueChart').getContext('2d');
+            charts.revenue = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Выручка',
+                            data: data.revenue,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Валовая прибыль',
+                            data: data.grossProfit,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Чистая прибыль',
+                            data: data.netIncome,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            // Круговая диаграмма расходов
+            if (charts.expense) charts.expense.destroy();
+            const ctx2 = document.getElementById('expenseChart').getContext('2d');
+            charts.expense = new Chart(ctx2, {
+                type: 'pie',
+                data: {
+                    labels: ['Зарплата', 'Аренда', 'Маркетинг', 'Администрирование'],
+                    datasets: [{
+                        data: [
+                            getInputValue('salary'),
+                            getInputValue('rent'),
+                            getInputValue('marketing'),
+                            getInputValue('admin')
+                        ],
+                        backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4bc0c0']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // График денежных потоков
+            if (charts.cashFlow) charts.cashFlow.destroy();
+            const ctx3 = document.getElementById('cashFlowChart').getContext('2d');
+            charts.cashFlow = new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Операционный CF',
+                            data: data.operatingCashFlow,
+                            backgroundColor: 'rgba(34, 197, 94, 0.6)',
+                            borderColor: '#22c55e',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Инвестиционный CF',
+                            data: data.investingCashFlow,
+                            backgroundColor: 'rgba(239, 68, 68, 0.6)',
+                            borderColor: '#ef4444',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Финансовый CF',
+                            data: data.financingCashFlow,
+                            backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                            borderColor: '#9966ff',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Чистый CF',
+                            data: data.netCashFlow,
+                            backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                            borderColor: '#3b82f6',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            // График накопительного денежного потока
+            if (charts.cumulative) charts.cumulative.destroy();
+            const ctx4 = document.getElementById('cumulativeCashChart').getContext('2d');
+            charts.cumulative = new Chart(ctx4, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Накопительный CF',
+                        data: data.cumulativeCashFlow,
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: false } },
+                    plugins: {
+                        annotation: {
+                            annotations: {
+                                line1: {
+                                    type: 'line',
+                                    yMin: 0,
+                                    yMax: 0,
+                                    borderColor: '#ef4444',
+                                    borderWidth: 2,
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateCalculations() {
+            calculatedData = calculateFinancials();
+            updatePLTable();
+            updateCashFlowTable();
+            updateBalanceSheet();
+            updateKPI();
+            updateCharts();
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            createLoanDividendInputs();
+            updateCalculations();
+        });
+    </script>
+</body>
+</html>
